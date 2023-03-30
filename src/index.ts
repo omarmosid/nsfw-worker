@@ -42,7 +42,7 @@ export default {
     const models = "nudity-2.0,wad,offensive";
     const sightengineApiUser = env.API_USER;
     const sightengineApiSecret = env.API_SECRET;
-    const sightengineUrl = `https://api.sightengine.com/1.0/nudity.json?models=${models}&url=${imageUrl}&api_user=${sightengineApiUser}&api_secret=${sightengineApiSecret}`;
+    const sightengineUrl = `https://api.sightengine.com/1.0/check.json?models=${models}&url=${imageUrl}&api_user=${sightengineApiUser}&api_secret=${sightengineApiSecret}`;
 
     const response = await fetch(sightengineUrl);
     const data: any = await response.json();
