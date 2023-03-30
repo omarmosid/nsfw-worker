@@ -28,10 +28,10 @@ export default {
     const imageUrl = url.searchParams.get("imageUrl");
     const secret = url.searchParams.get("secret");
     if (!imageUrl) {
-      return new Response("No Image url", { status: 500 });
+      return new Response("No Image url", { status: 400 });
     }
     if (!secret || secret !== env.APP_SECRET) {
-      return new Response("No Secret or Invalid secret", { status: 500 });
+      return new Response("No Secret or Invalid secret", { status: 400 });
     }
 
     const models = "nudity-2.0,wad,offensive";
@@ -47,21 +47,29 @@ export default {
     }
 
     if (data.nudity.raw >= 0.5) {
-      return new Response(
-        JSON.stringify({
-          isNSFW: true,
-          imageUrl: "https://placehold.co/400x400?text=NSFW",
-        }),
-        { status: 200 }
+      const { imageBuffer, imageType } = await getImage(
+        "https://placehold.co/400x400?text=NSFW"
       );
+      return new Response(imageBuffer, {
+        headers: { "Content-Type": imageType },
+      });
     } else {
-      return new Response(
-        JSON.stringify({
-          isNSFW: false,
-          imageUrl: imageUrl,
-        }),
-        { status: 200 }
-      );
+      const { imageBuffer, imageType } = await getImage(imageUrl);
+      return new Response(imageBuffer, {
+        headers: { "Content-Type": imageType },
+      });
     }
   },
+};
+
+const getImage = async (imageUrl: string) => {
+  const imageResponse = await fetch(imageUrl);
+  const imageBuffer = await imageResponse.arrayBuffer();
+  const imageType = imageResponse.headers.get("Content-Type") || "";
+  const validImageTypes = ["image/jpeg", "image/png"];
+  //   if (!validImageTypes.includes(imageType)) {
+  //     return new Response("Bad Image", { status: 400 });
+  //   }
+
+  return { imageBuffer, imageType };
 };
