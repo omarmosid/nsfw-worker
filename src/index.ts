@@ -44,12 +44,11 @@ export default {
     const models = "nudity-2.0,wad,offensive";
     const sightengineApiUser = env.API_USER;
     const sightengineApiSecret = env.API_SECRET;
-    const sightenginWorkflow = env.API_SECRET;
-    const sightengineUrl = `https://api.sightengine.com/1.0/check-workflow.json?workflow=${sightenginWorkflow}&url=${imageUrl}&api_user=${sightengineApiUser}&api_secret=${sightengineApiSecret}`;
+    const sightengineWorkflow = env.API_WORKFLOW;
+    const sightengineUrl = `https://api.sightengine.com/1.0/check-workflow.json?workflow=${sightengineWorkflow}&url=${imageUrl}&api_user=${sightengineApiUser}&api_secret=${sightengineApiSecret}`;
 
     const response = await fetch(sightengineUrl);
     const data: any = await response.json();
-    console.log("data", data);
 
     if (data.error) {
       return new Response("Error", { status: 500 });
