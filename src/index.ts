@@ -15,6 +15,8 @@ export interface Env {
 
   API_SECRET: string;
 
+  API_WORKFLOW: string;
+
   APP_SECRET: string;
 }
 
@@ -27,7 +29,7 @@ export default {
     const url = new URL(request.url);
     const imageUrl = url.searchParams.get("imageUrl");
     const secret = url.searchParams.get("secret");
-    const defaultMessage = "this image is NSFW lol";
+    const defaultMessage = "This image is NSFW";
     const message = url.searchParams.get("message") || defaultMessage;
 
     if (!imageUrl) {
@@ -42,26 +44,28 @@ export default {
     const models = "nudity-2.0,wad,offensive";
     const sightengineApiUser = env.API_USER;
     const sightengineApiSecret = env.API_SECRET;
-    const sightengineUrl = `https://api.sightengine.com/1.0/check.json?models=${models}&url=${imageUrl}&api_user=${sightengineApiUser}&api_secret=${sightengineApiSecret}`;
+    const sightenginWorkflow = env.API_SECRET;
+    const sightengineUrl = `https://api.sightengine.com/1.0/check-workflow.json?workflow=${sightenginWorkflow}&url=${imageUrl}&api_user=${sightengineApiUser}&api_secret=${sightengineApiSecret}`;
 
     const response = await fetch(sightengineUrl);
     const data: any = await response.json();
+    console.log("data", data);
 
     if (data.error) {
       return new Response("Error", { status: 500 });
     }
 
-    if (data.nudity.raw >= 0.5) {
+    if (data.summary.action === "reject") {
       const { imageBuffer, imageType } = await getImage(
         `https://placehold.co/400x400/222222/EEEEEE/png?text=${message}`
       );
       return new Response(imageBuffer, {
-        headers: { "Content-Type": imageType },
+        headers: { "Content-Type": imageType, body: JSON.stringify(data) },
       });
     } else {
       const { imageBuffer, imageType } = await getImage(imageUrl);
       return new Response(imageBuffer, {
-        headers: { "Content-Type": imageType },
+        headers: { "Content-Type": imageType, body: JSON.stringify(data) },
       });
     }
   },
