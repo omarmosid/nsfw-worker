@@ -15,11 +15,3 @@ If it is not NSFW then you'll just get back the original url
 fetch(`https://nsfw-worker.omarmo.workers.dev/?secret=${APP_SECRET}&imageUrl=${IMAGE_URL}`)
 
 ```
-
-## Example response
-```json
-{
-    "isNSFW": true,
-    "imageUrl": "https://placehold.co/400x400?text=NSFW"
-}
-```
