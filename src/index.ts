@@ -29,8 +29,8 @@ export default {
     const url = new URL(request.url);
     const imageUrl = url.searchParams.get("imageUrl");
     const secret = url.searchParams.get("secret");
-    const defaultMessage = "This image is NSFW";
-    const message = url.searchParams.get("message") || defaultMessage;
+    const nsfwMessage = "This image is NSFW";
+    const message = url.searchParams.get("message") || "Hola!";
 
     if (!imageUrl) {
       return new Response("No Image url", { status: 400 });
@@ -50,13 +50,22 @@ export default {
     const response = await fetch(sightengineUrl);
     const data: any = await response.json();
 
+    // If there is an error return a generic album art image
     if (data.error) {
-      return new Response("Error", { status: 500 });
+      const { imageBuffer, imageType } = await getImage(
+        `https://placehold.co/400x400/444/BBB/png?text=${message}`
+      );
+      return new Response(imageBuffer, {
+        headers: {
+          "Content-Type": imageType,
+          body: JSON.stringify({ error: data.error }),
+        },
+      });
     }
 
     if (data.summary.action === "reject") {
       const { imageBuffer, imageType } = await getImage(
-        `https://placehold.co/400x400/222222/EEEEEE/png?text=${message}`
+        `https://placehold.co/400x400/222222/EEEEEE/png?text=${nsfwMessage}`
       );
       return new Response(imageBuffer, {
         headers: { "Content-Type": imageType, body: JSON.stringify(data) },
