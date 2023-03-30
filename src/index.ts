@@ -48,7 +48,7 @@ export default {
 
     if (data.nudity.raw >= 0.5) {
       const { imageBuffer, imageType } = await getImage(
-        "https://placehold.co/400x400?text=NSFW"
+        "https://placehold.co/400x400/222222/EEEEEE/png?text=NSFW"
       );
       return new Response(imageBuffer, {
         headers: { "Content-Type": imageType },
